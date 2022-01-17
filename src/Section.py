@@ -152,8 +152,8 @@ class Section:
     # Draws the faces
     def draw(self):
         # A compléter en remplaçant pass par votre code
-        #if self.parameters["edges"]:
-            #self.drawEdges()
+        if self.parameters["edges"]:
+            self.drawEdges()
             
         gl.glPushMatrix()
         gl.glTranslate(self.parameters['position'][0], self.parameters['position'][1], self.parameters['position'][2])            
