@@ -74,7 +74,9 @@ class Configuration:
 
         gl.glMatrixMode(gl.GL_MODELVIEW)
         gl.glLoadIdentity()
-        gl.glTranslatef(0.0,0.0, self.parameters['screenPosition'])       
+        gl.glTranslatef(0.0,0.0, self.parameters['screenPosition'])    
+        
+        gl.glRotatef(-90, 1, 0, 0)
         
     # Getter
     def getParameter(self, parameterKey):
@@ -142,6 +144,74 @@ class Configuration:
         elif self.event.dict['unicode'] == 'z' or self.event.key == pygame.K_z:
             gl.glRotate(2.5, 0, 0, 1) 
         
+        # Draws or suppresses the reference frame
+        elif self.event.dict['unicode'] == 'a' or self.event.key == pygame.K_a:
+            self.parameters['axes'] = not self.parameters['axes']
+            pygame.time.wait(300)
+            
+        elif self.event.key == pygame.K_PAGEUP: 
+            gl.glScalef(1.1, 1.1, 1.1) 
+
+
+        
+        elif self.event.key == pygame.K_PAGEDOWN :
+            gl.glScalef(0.9, 0.9, 0.9)
+
+    
+    # Processes the MOUSEBUTTONDOWN event
+    def processMouseButtonDownEvent(self):
+        if self.event.type == pygame.MOUSEBUTTONDOWN :
+            if self.event.button == 4 :
+                gl.glScalef(1.1, 1.1, 1.1) 
+            elif self.event.button == 5 :
+                gl.glScalef(0.9, 0.9, 0.9)
+    
+    # Processes the MOUSEMOTION event
+    def processMouseMotionEvent(self):
+        if pygame.mouse.get_pressed()[0]==1:
+            gl.glRotate(self.event.rel[0],1,0,0)
+            gl.glRotate(self.event.rel[1],0,0,1)       
+        if pygame.mouse.get_pressed()[2]==1:
+            gl.glTranslatef(self.event.rel[0]/100,0,self.event.rel[1]/100)  
+            
+        
+    # Displays on screen and processes events    
+    def display(self): 
+           
+        # Displays on screen
+        self.draw()
+        pygame.display.flip() 
+    
+        # Allows keybord events to be repeated
+        pygame.key.set_repeat(1, 100)
+
+        # Infinite loop    
+        while True:
+
+            # Waits for an event
+            self.event = pygame.event.wait()
+ 
+            # Processes the event
+            
+            # Quit pygame (compatibility with pygame1.9.6 and 2.0.0)
+            if self.event.type == pygame.QUIT or (self.event.type == pygame.WINDOWEVENT and pygame.event.wait(100).type == pygame.QUIT):
+                pygame.quit()
+                break  
+
+            elif self.event.type == pygame.KEYDOWN: 
+                self.processKeyDownEvent()
+                
+            elif self.event.type == pygame.MOUSEBUTTONDOWN:
+                self.processMouseButtonDownEvent() 
+            
+            elif self.event.type == pygame.MOUSEMOTION: 
+                self.processMouseMotionEvent()
+                
+            # Clears the buffer and displays on screen the result of the keybord action
+            gl.glClear(gl.GL_COLOR_BUFFER_BIT|gl.GL_DEPTH_BUFFER_BIT)
+            self.draw()
+            pygame.event.clear()
+            pygame.display.flip()
         # Draws or suppresses the reference frame
         elif self.event.dict['unicode'] == 'a' or self.event.key == pygame.K_a:
             self.parameters['axes'] = not self.parameters['axes']
