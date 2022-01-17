@@ -213,9 +213,9 @@ class Configuration:
             pygame.event.clear()
             pygame.display.flip()
         # Draws or suppresses the reference frame
-        elif self.event.dict['unicode'] == 'a' or self.event.key == pygame.K_a:
-            self.parameters['axes'] = not self.parameters['axes']
-            pygame.time.wait(300)
+            if self.event.dict['unicode'] == 'a' or self.event.key == pygame.K_a:
+              self.parameters['axes'] = not self.parameters['axes']
+              pygame.time.wait(300)
     
     # Processes the MOUSEBUTTONDOWN event
     def processMouseButtonDownEvent(self):
