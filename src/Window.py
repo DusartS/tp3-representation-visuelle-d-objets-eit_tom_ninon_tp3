@@ -7,74 +7,75 @@ Created on Thu Nov 16 19:47:50 2017
 import OpenGL.GL as gl
 from Section import Section
 
-class Window:
+class Wall:
     # Constructor
     def __init__(self, parameters = {}) :  
         # Parameters
-        # position: position of the window
-        # width: width of the window
-        # height: height of the window
-        # thickness: thickness of the window
-        # color: colr of the window     
-        # wings: number of wings
+        # position: position of the wall 
+        # width: width of the wall - mandatory
+        # height: height of the wall - mandatory
+        # thickness: thickness of the wall
+        # color: color of the wall        
 
         # Sets the parameters
         self.parameters = parameters
-
-        # Sets the default parameters 
+        
+        # Sets the default parameters
         if 'position' not in self.parameters:
-            self.parameters['position'] = [0, 0, 0]       
+            self.parameters['position'] = [0, 0, 0]        
         if 'width' not in self.parameters:
-            self.parameters['width'] = 1.25
+            raise Exception('Parameter "width" required.')   
         if 'height' not in self.parameters:
-            self.parameters['height'] = 1
+            raise Exception('Parameter "height" required.')   
+        if 'orientation' not in self.parameters:
+            self.parameters['orientation'] = 0              
         if 'thickness' not in self.parameters:
-            self.parameters['thickness'] = 0.05    
+            self.parameters['thickness'] = 0.2    
         if 'color' not in self.parameters:
-            self.parameters['color'] = [0.9, 0.95, 1] 
-        if 'wings' not in self.parameters:
-            self.parameters['wings'] = 2        
+            self.parameters['color'] = [0.5, 0.5, 0.5]       
             
-        # Initializes the object list
-        self.objects = []       
+        # Objects list
+        self.objects = []
 
-        # Adds Section objects for this object
-        for i in range(self.parameters['wings']):
-            # Adds Section for this object
-            section = Section({'position': [i*self.parameters['width']/self.parameters['wings'], 0, 0],
-                                      'width': self.parameters['width']/self.parameters['wings'], \
+        # Adds a Section for this object
+        self.parentSection = Section({'width': self.parameters['width'], \
                                       'height': self.parameters['height'], \
                                       'thickness': self.parameters['thickness'], \
-                                      'color': self.parameters['color']})
-            self.objects.append(section) 
+                                      'color': self.parameters['color'],
+                                      'position': self.parameters['position']})
+        self.objects.append(self.parentSection) 
         
     # Getter
     def getParameter(self, parameterKey):
-        return self.parameters[parameterKey]  
-
+        return self.parameters[parameterKey]
+    
     # Setter
     def setParameter(self, parameterKey, parameterValue):
         self.parameters[parameterKey] = parameterValue
-        return self    
- 
-    # Adds an object to the object list
-    def add(self, x):
-        self.objects.append(x)
+        return self                 
+
+    # Finds the section where the object x can be inserted
+    def findSection(self, x):
+        for item in enumerate(self.objects):
+            if isinstance(item[1], Section) and item[1].canCreateOpening(x):
+                return item
+        return None
+    
+    # Adds an object    
+    def add(self, x):    
+        # A compléter en remplaçant pass par votre code
+        findsection = self.findSection(x)   
+        self.objects.pop(findsection[0])
+        self.objects.extend(findsection[1].createNewSections(x))
         return self
-           
+                    
+                    
     # Draws the faces
     def draw(self):
+        # A compléter en remplaçant pass par votre cod
         gl.glPushMatrix()
-        
-        # Defines the new transformation matrix : translation
-        gl.glTranslatef(self.parameters['position'][0], self.parameters['position'][1], self.parameters['position'][2])
-        
-        # Draws the objects    
-        for x in self.objects:
-            x.drawEdges()
-            x.draw()
-            
-        # Restores the frame coordinates   
-        gl.glPopMatrix() 
-
-        
+        gl.glRotate(self.parameters["orientation"],0,0,1)
+        for i in self.objects:
+          i.draw()
+        gl.glPopMatrix()
+  
