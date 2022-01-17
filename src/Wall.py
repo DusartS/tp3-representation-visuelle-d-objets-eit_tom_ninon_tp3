@@ -64,10 +64,18 @@ class Wall:
     # Adds an object    
     def add(self, x):    
         # A compléter en remplaçant pass par votre code
-        pass        
+        findsection = self.findSection(x)   
+        self.objects.pop(findsection[0])
+        self.objects.extend(findsection[1].createNewSections(x))
+        return self
+                    
                     
     # Draws the faces
     def draw(self):
-        # A compléter en remplaçant pass par votre code
-        pass
+        # A compléter en remplaçant pass par votre cod
+        gl.glPushMatrix()
+        gl.glRotate(self.parameters["orientation"],0,0,1)
+        for i in self.objects:
+          i.draw()
+        gl.glPopMatrix()
   
